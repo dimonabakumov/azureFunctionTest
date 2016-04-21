@@ -1,6 +1,7 @@
 ﻿#load "..\BandLabApiModels\AuthorizationModel.csx"
 
 using System;
+using System.Text;
 
 public class Registration
 {
