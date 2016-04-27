@@ -14,7 +14,7 @@ public class BaseModelQuery
     public BaseModelQuery(string tableName)
 	{
         //Get connection string to storage
-        var storageAccount = CloudStorageAccount.Parse("UseDevelopmentStorage=true;");
+        var storageAccount = CloudStorageAccount.Parse(Environment.GetEnvironmentVariable("Storage"));
 
         // Create the table client.
         tableClient = storageAccount.CreateCloudTableClient();
