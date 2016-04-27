@@ -1,6 +1,8 @@
-﻿using System;
+﻿#load "Entity.csx"
 
-public class AuthorizationModel 
+using System;
+
+public class AuthorizationModel : Entity
 {
     public string Login { get; set; }
 

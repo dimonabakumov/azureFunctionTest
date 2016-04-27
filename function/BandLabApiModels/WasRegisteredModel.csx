@@ -1,6 +1,8 @@
-﻿using System;
+﻿#load "Entity.csx"
 
-public class WasRegisteredModel
+using System;
+
+public class WasRegisteredModel : Entity
 {
     public string SessionKey { get; set; }
 

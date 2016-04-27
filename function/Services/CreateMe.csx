@@ -1,19 +1,27 @@
 ﻿#r "System.Net.Http"
 #r "Newtonsoft.Json"
+#r "Microsoft.WindowsAzure.Storage"
 
-#load "..\ModelsGenerator\Registration.csx"
 #load "..\BandLabApiModels\AuthorizationModel.csx"
-#load "..\BandLabApiModels\WasRegisteredModel.csx"
+#load "..\Requests\Authorisation.csx"
+#load "..\TableStorage\Queries\UserModelQuery.csx"
 
 using System;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using Newtonsoft.Json;
+using Microsoft.WindowsAzure.Storage;
+using Microsoft.WindowsAzure.Storage.Table;
+
+
 
 public class CreateMe
 {
-	public object Auth()
+	public object Auth(string userId)
 	{
+        var userQuery = new UserModelQuery();
+        userQuery.TryGet(userId, Actions.Me);
+
         var generedUser = new AuthorizationModel
         {
             Username = "dimon",
@@ -22,19 +30,9 @@ public class CreateMe
             ClientId = "Angular"
         };
 
-        string Identity = "https://identity-test.bandlab.com/v1.0/";
+        var registeredUser = new Authorisation().GetUser(generedUser, userId, Actions.Me);
+        var result = userQuery.Add(registeredUser);
 
-        //Register new user
-
-        var toApi = new HttpClient();
-        //var postContent = new StringContent(generedUser.ToJson());
-        var postContent = new StringContent(JsonConvert.SerializeObject(generedUser));
-        postContent.Headers.ContentType = new MediaTypeHeaderValue("Application/Json");
-        var post = toApi.PostAsync(Identity + "authorizations", postContent).Result;
-
-
-        //Extract auth token
-
-        return JsonConvert.DeserializeObject<WasRegisteredModel>(post.Content.ReadAsStringAsync().Result);
+        return registeredUser;
     }
 }

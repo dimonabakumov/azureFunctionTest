@@ -1,9 +1,12 @@
 #r "System.Web"
 #r "System.Net"
 #r "System.Net.Http"
+#r "ScriptCs.WebApi.Pack.dll"
 #r "Newtonsoft.Json"
 
 #load "SlackInterpreter.csx"
+#load "Configuration\ApiUrls.csx"
+#load "Configuration\JsonConfiguration.csx"
 
 using System;
 using System.Net;
