@@ -4,6 +4,8 @@
 #load "..\Models\UserStorageModel.csx"
 
 using System;
+using Microsoft.WindowsAzure.Storage;
+using Microsoft.WindowsAzure.Storage.Table;
 
 public class PostModelQuery : BaseModelQuery
 {
