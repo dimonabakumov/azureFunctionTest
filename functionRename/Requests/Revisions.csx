@@ -4,6 +4,9 @@
 #load "..\BandLabApiModels\RevisionModel.csx"
 
 using System;
+using System.Net.Http;
+using System.Net.Http.Headers;
+using Newtonsoft.Json;
 
 public class Revisions
 {
