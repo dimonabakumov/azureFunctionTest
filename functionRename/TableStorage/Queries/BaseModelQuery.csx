@@ -4,6 +4,7 @@
 using System;
 using System.Linq;
 using System.Collections.Specialized;
+using Microsoft.WindowsAzure.Storage;
 
 public class BaseModelQuery
 {
