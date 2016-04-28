@@ -1,6 +1,4 @@
 ﻿#r "System.Collections"
-#r "Microsoft.WindowsAzure.Storage"
-#r "scriptcs_packages\WindowsAzure.Storage.5.0.2\lib\net40\Microsoft.WindowsAzure.Storage.dll"
 
 using System;
 using System.Linq;
