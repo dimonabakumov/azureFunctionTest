@@ -1,6 +1,6 @@
 {
   "frameworks": {
-    "net46":{
+    "net40":{
       "dependencies": {
         "WindowsAzure.Storage": "5.0.2",
         "Microsoft.WindowsAzure.ConfigurationManager": "3.2.1"
