@@ -1,5 +1,5 @@
 ﻿#load "Services\CreateMe.csx"
-#load "Services\RevisionService.csx"
+//#load "Services\RevisionService.csx"
 #load "TableStorage\Queries\SlackModelQuery.csx"
 
 using System;
@@ -32,9 +32,9 @@ public class SlackInterpreter
                 return new CreateMe().Auth(userId);
                 break;
 
-            case 2:
-                return new RevisionService().CreateIfNotExists(userId);
-                break;
+            //case 2:
+            //    return new RevisionService().CreateIfNotExists(userId);
+            //    break;
 
             //case 3:
             //    return 3;
