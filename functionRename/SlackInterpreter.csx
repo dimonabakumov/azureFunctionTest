@@ -1,5 +1,5 @@
 ﻿#load "Services\CreateMe.csx"
-//#load "Services\RevisionService.csx"
+#load "Services\RevisionService.csx"
 #load "TableStorage\Queries\SlackModelQuery.csx"
 
 using System;
