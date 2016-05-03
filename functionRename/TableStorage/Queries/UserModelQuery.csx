@@ -15,7 +15,7 @@ public class UserModelQuery : BaseModelQuery
     {
         var exQuery = new TableQuery<UserStorageModel>().Where(
                 TableQuery.CombineFilters(
-                TableQuery.GenerateFilterCondition("SlackUserId", QueryComparisons.Equal, userId),
+                TableQuery.GenerateFilterCondition("RowKey", QueryComparisons.Equal, userId),
                 TableOperators.And,
                 TableQuery.GenerateFilterCondition("Actions", QueryComparisons.Equal, action.ToString())));
 
