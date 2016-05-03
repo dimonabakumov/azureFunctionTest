@@ -32,9 +32,9 @@ public class SlackInterpreter
                 return new CreateMe().Auth(userId);
                 break;
 
-            //case 2:
-            //    return new RevisionService().CreateIfNotExists(userId);
-            //    break;
+            case 2:
+                return new RevisionService().CreateIfNotExists(userId);
+                break;
 
             //case 3:
             //    return 3;
