@@ -10,6 +10,8 @@ public class SongModel : Entity
 
     public bool Forkable { get; set; }
 
+    public SongModel() { }
+
     public SongModel(string name)
     {
         Name = name;

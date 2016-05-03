@@ -1,4 +1,6 @@
-﻿#load "..\Configuration\ApiUrls.csx"
+﻿#r "Newtonsoft.Json"
+
+#load "..\Configuration\ApiUrls.csx"
 #load "..\Configuration\JsonConfiguration.csx"
 #load "..\TableStorage\Models\PostStorageModel.csx"
 #load "..\BandLabApiModels\RevisionModel.csx"
