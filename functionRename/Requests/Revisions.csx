@@ -38,4 +38,15 @@ public class Revisions
             CreatorId = user.Id,
         };
     }
+
+    public int Like(PostStorageModel revision, UserStorageModel user)
+    {
+        var toApi = new HttpClient();
+        toApi.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", user.AccessToken);
+        //var postContent = new StringContent(JsonConvert.SerializeObject(revision));
+        //postContent.Headers.ContentType = new MediaTypeHeaderValue("Application/Json");
+        var like = toApi.PostAsync(ApiUrls.Api + $"revisions({revision.Id})/likes", null).Result;
+
+        return (int)like.StatusCode;
+    }
 }

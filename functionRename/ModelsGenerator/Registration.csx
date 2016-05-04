@@ -13,8 +13,6 @@ public class Registration
     {
         var newUser = new AuthorizationModel
         {
-            //Username = GetRandomLetters(1) + GetNormalizedGuid(15),
-            //Password = GetRandomLetters(5) + GetRandomNumbers(5) + GetNormalizedGuid(10) + GetRandomLetters(5).ToUpper(),
             Password = "password",
             Name = RandomName()
         };
@@ -24,19 +22,6 @@ public class Registration
         newUser.RememberMe = true;
         newUser.ClientId = "Angular";
         newUser.Provider = "Password";
-
-        //switch (regAuthType)
-        //{
-        //    case RegAuthType.Password:
-        //        newUser.Provider = "Password";
-        //        break;
-        //    case RegAuthType.Token:
-        //        newUser.Provider = "token";
-        //        break;
-        //    case RegAuthType.Anonymous:
-        //        newUser.Provider = "anonymous";
-        //        break;
-        //}
 
         return newUser;
     }

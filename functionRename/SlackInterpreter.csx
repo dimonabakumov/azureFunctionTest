@@ -1,6 +1,7 @@
 ﻿#load "Services\CreateMe.csx"
 #load "Services\RevisionService.csx"
 #load "TableStorage\Queries\SlackModelQuery.csx"
+#load "ModelsGenerator\Registration.csx"
 
 using System;
 using System.Web;
@@ -24,16 +25,23 @@ public class SlackInterpreter
         }
     }
 
-    public object ExecCommand(int digitCommand, string userId)
+    public object ExecCommand(int digitCommand, string sessionId)
     {
         switch (digitCommand)
         {
             case 1:
-                return new CreateMe().Auth(userId);
+                var reg = new CreateMe().Auth(sessionId);
+                return new { text = "Registered! Username : " + reg.UserName + " Password : " + reg.Password };
                 break;
 
             case 2:
-                return new RevisionService().CreateIfNotExists(userId);
+                var revision = new RevisionService().CreateIfNotExists(sessionId);
+                var newLiker = new Authorisation().GetUser(new Registration().Generate(), sessionId, Actions.LikeYourRevision);
+                var like = new Revisions().Like(revision, newLiker);
+                if (like == 202)
+                    return new { text = "Liked" };
+                else
+                    return new { text = "Something went wrong" };
                 break;
 
             //case 3:

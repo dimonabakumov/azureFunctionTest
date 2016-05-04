@@ -7,7 +7,7 @@ using System;
 
 public class RevisionService
 {
-	public object CreateIfNotExists(string sessionId)
+	public PostStorageModel CreateIfNotExists(string sessionId)
 	{
         var me = new UserModelQuery().Get(sessionId, Actions.Me);
         var postQuery = new PostModelQuery();
