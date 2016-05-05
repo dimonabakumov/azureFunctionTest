@@ -14,7 +14,9 @@ public class PostModelQuery : BaseModelQuery
     public PostStorageModel Get(Guid creatorId)
     {
         var exQuery = new TableQuery<PostStorageModel>().Where(
-            TableQuery.GenerateFilterCondition("CreatorId", QueryComparisons.Equal, creatorId.ToString()));
+            TableQuery.GenerateFilterConditionForGuid("CreatorId", QueryComparisons.Equal, creatorId));
+
+        var list = table.ExecuteQuery(exQuery).ToList();
 
         return table.ExecuteQuery(exQuery).FirstOrDefault();
     }

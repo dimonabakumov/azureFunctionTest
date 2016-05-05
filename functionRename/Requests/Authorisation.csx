@@ -12,14 +12,7 @@ using Newtonsoft.Json;
 
 public class Authorisation
 {
-	public Authorisation()
-	{
-	}
-
-    //public UserStorageModel GetUser()
-    //{
-    //    return new UserStorageModel();
-    //}
+	public Authorisation() { }
 
     public UserStorageModel GetUser(AuthorizationModel authUser, string sessionId, Actions action)
     {
