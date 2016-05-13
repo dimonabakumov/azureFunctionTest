@@ -6,6 +6,7 @@
 using System;
 using System.Net.Http;
 using System.Net.Http.Headers;
+using System.Threading.Tasks;
 
 public class Following
 {
@@ -15,17 +16,33 @@ public class Following
     {
         var toApi = new HttpClient();
         toApi.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", follower.AccessToken);
-        var like = toApi.PostAsync(ApiUrls.Api + $"users({userId})/followers", null).Result;
+        var follow = toApi.PostAsync(ApiUrls.Api + $"users({userId})/followers", null).Result;
 
-        return (int)like.StatusCode;
+        return (int)follow.StatusCode;
     }
 
-    public int Unfollow(Guid userId, UserStorageModel follower)
+    public int Unfollow(Guid userId, List<UserStorageModel> followers)
     {
-        var toApi = new HttpClient();
-        toApi.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", follower.AccessToken);
-        var like = toApi.DeleteAsync(ApiUrls.Api + $"users({userId})/followers").Result;
+        List<Task<HttpResponseMessage>> tasks = new List<Task<HttpResponseMessage>>();
+        foreach (var follower in followers)
+        {
+            var t = Task.Run(async () =>
+            {
+                using (var toApi = new HttpClient { Timeout = TimeSpan.FromSeconds(180) })
+                {
+                    toApi.DefaultRequestHeaders.Add("Authorization", "Bearer " + follower.AccessToken);
+                    return await toApi.DeleteAsync(ApiUrls.Api + $"users({userId})/followers");
+                }
+            });
 
-        return (int)like.StatusCode;
+            tasks.Add(t);
+        }
+
+        Task.WaitAll(tasks.ToArray());
+
+        if (tasks.FirstOrDefault(x => x.Result.StatusCode != HttpStatusCode.NoContent) != null)
+            return 400;
+
+        return 204;
     }
 }

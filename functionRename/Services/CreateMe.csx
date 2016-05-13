@@ -17,7 +17,7 @@ using Microsoft.WindowsAzure.Storage.Table;
 
 public class CreateMe
 {
-	public object Auth(string userId)
+	public UserStorageModel Auth(string userId)
 	{
         var userQuery = new UserModelQuery();
         userQuery.TryGet(userId, Actions.Me);

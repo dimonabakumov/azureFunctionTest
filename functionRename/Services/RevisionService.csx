@@ -2,6 +2,7 @@
 #load "..\Requests\Revisions.csx"
 #load "..\TableStorage\Queries\PostModelQuery.csx"
 #load "..\TableStorage\Models\UserStorageModel.csx"
+#load "..\TableStorage\Models\LikeStorageModel.csx"
 
 using System;
 
@@ -25,5 +26,32 @@ public class RevisionService
 
             return postStorageModel;
         }
+    }
+
+    public string Like(string sessionId)
+    {
+        var revision = CreateIfNotExists(sessionId);
+        var newLiker = new Authorisation().GetUser(new Registration().Generate(), sessionId, Actions.LikeYourRevision);
+        new UserModelQuery().Add(newLiker);
+        var like = new Revisions().Like(revision, newLiker);
+        if (like == 202)
+        {
+            var newLike = new LikeStorageModel()
+            {
+                PostId = revision.Id,
+                UserId = newLiker.Id
+            };
+            new LikeModelQuery().Add(newLike);
+            return "Liked";
+        }
+        else
+            return "Something went wrong";
+    }
+
+    public string Dislike(string sessionId)
+    {
+        var me = new UserModelQuery().Get(sessionId, Actions.Me);
+        var myLikers = new UserModelQuery().GetList(sessionId, Actions.LikeYourRevision);
+        return "Disliked";
     }
 }

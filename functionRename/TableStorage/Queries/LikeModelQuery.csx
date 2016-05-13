@@ -11,4 +11,10 @@ public class LikeModelQuery : BaseModelQuery
 {
     public LikeModelQuery() : base(TablesNames.Like) { }
 
+    public void Add(LikeStorageModel like)
+    {
+        TableOperation insertOperation = TableOperation.Insert(like);
+
+        table.Execute(insertOperation);
+    }
 }

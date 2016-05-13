@@ -1,10 +1,7 @@
 ﻿#load "Services\CreateMe.csx"
 #load "Services\RevisionService.csx"
+#load "Services\FollowService.csx"
 #load "TableStorage\Queries\SlackModelQuery.csx"
-#load "TableStorage\Queries\UserModelQuery.csx"
-#load "ModelsGenerator\Registration.csx"
-#load "Requests\Following.csx"
-#load "Requests\Revisions.csx"
 
 using System;
 using System.Web;
@@ -48,37 +45,25 @@ public class SlackInterpreter
             // Follow me
 
             case 2:
-                var me = new UserModelQuery().Get(sessionId, Actions.Me);
-                var newFollower = new Authorisation().GetUser(new Registration().Generate(), sessionId, Actions.FollowYou);
-                var follow = new Following().Follow(me.Id, newFollower);
-                if (follow == 204)
-                    return new { text = "Followed" };
-                else
-                    return new { text = "Something went wrong" };
+                return new { text = new FollowService().Follow(sessionId) };
                 break;
 
             // Unfollow me
 
             case 3:
-                return new { text = "Not ready yet" };
+                return new { text = new FollowService().Unfollow(sessionId) };
                 break;
 
             // Like my revision
 
             case 4:
-                var revision = new RevisionService().CreateIfNotExists(sessionId);
-                var newLiker = new Authorisation().GetUser(new Registration().Generate(), sessionId, Actions.LikeYourRevision);
-                var like = new Revisions().Like(revision, newLiker);
-                if (like == 202)
-                    return new { text = "Liked" };
-                else
-                    return new { text = "Something went wrong" };
+                return new { text = new RevisionService().Like(sessionId) };
                 break;
 
-            // Unlike my revision
+            // Dislike my revision
 
             case 5:
-                return new { text = "Not ready yet" };
+                return new { text = new RevisionService().Dislike(sessionId) };
                 break;
 
             // Unknown command
