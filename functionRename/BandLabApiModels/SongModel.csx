@@ -8,19 +8,22 @@ public class SongModel : Entity
 
     public Guid? BandId { get; set; }
 
-    public bool Forkable { get; set; }
+    public bool IsForkable { get; set; }
+
+    public RevisionModel Revision { get; set; }
 
     public SongModel() { }
 
     public SongModel(string name)
     {
         Name = name;
-        Forkable = true;
+        IsForkable = true;
     }
 
     public SongModel(Guid bandId)
     {
+        Name = "PATCHED Azure song name";
         BandId = bandId;
-        Forkable = true;
+        IsForkable = true;
     }
 }

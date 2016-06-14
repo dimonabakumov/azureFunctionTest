@@ -33,8 +33,7 @@ public class UserModelQuery : BaseModelQuery
 
     public void Add(UserStorageModel createdUser)
     {
-        TableOperation insertOperation = TableOperation.Insert(createdUser);
-
+        var insertOperation = TableOperation.Insert(createdUser);
         table.Execute(insertOperation);
     }
 
@@ -42,8 +41,36 @@ public class UserModelQuery : BaseModelQuery
     {
         foreach (var user in users)
         {
-            TableOperation deleteOperation = TableOperation.Delete(user);
+            var deleteOperation = TableOperation.Delete(user);
             table.Execute(deleteOperation);
+        }
+    }
+
+    public void Update(string partitionKey, string rowKey, Guid? revisionId = null, long? commentId = null, Guid? bandId = null, Guid? songId = null, Guid? postId = null)
+    {
+        var retrieveOperation = TableOperation.Retrieve<UserStorageModel>(partitionKey, rowKey);
+        var retrievedResult = table.Execute(retrieveOperation);
+        var updateEntity = (UserStorageModel)retrievedResult.Result;
+
+        if (updateEntity != null)
+        {
+            if(revisionId.HasValue)
+                updateEntity.RevisionId = revisionId;
+
+            if (commentId.HasValue)
+                updateEntity.CommentId = commentId;
+
+            if (bandId.HasValue)
+                updateEntity.BandId = bandId;
+
+            if (songId.HasValue)
+                updateEntity.SongId = songId;
+
+            if (postId.HasValue)
+                updateEntity.PostId = postId;
+
+            var insertOrReplaceOperation = TableOperation.InsertOrReplace(updateEntity);
+            table.Execute(insertOrReplaceOperation);
         }
     }
 
@@ -51,7 +78,7 @@ public class UserModelQuery : BaseModelQuery
     {
         return new TableQuery<UserStorageModel>().Where(
             TableQuery.CombineFilters(
-                TableQuery.GenerateFilterCondition("RowKey", QueryComparisons.Equal, sessionId),
+                TableQuery.GenerateFilterCondition("PartitionKey", QueryComparisons.Equal, sessionId),
                 TableOperators.And,
                 TableQuery.GenerateFilterCondition("Actions", QueryComparisons.Equal, action.ToString())));
     }

@@ -38,9 +38,8 @@ public class Authorisation
 
         return new UserStorageModel
         {
-            PartitionKey = DateTimeOffset.Now.Ticks.ToString(),
-            RowKey = sessionId,
-            Id = me.Id,
+            PartitionKey = sessionId,
+            RowKey = me.Id.ToString(),
             Password = authUser.Password,
             UserName = me.UserName,
             AccessToken = wasRegister.SessionKey,

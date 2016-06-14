@@ -1,10 +1,10 @@
 ﻿#r "System.Collections"
+#r "Microsoft.WindowsAzure.Storage"
 
 using System;
 using System.Linq;
 using System.Collections.Specialized;
 using Microsoft.WindowsAzure.Storage;
-using Microsoft.WindowsAzure.Storage.Table;
 
 public class BaseModelQuery
 {
@@ -15,7 +15,7 @@ public class BaseModelQuery
     public BaseModelQuery(string tableName)
 	{
         //Get connection string to storage
-        var storageAccount = CloudStorageAccount.Parse(Environment.GetEnvironmentVariable("Storage"));
+        var storageAccount = CloudStorageAccount.Parse("UseDevelopmentStorage=true;");
 
         // Create the table client.
         tableClient = storageAccount.CreateCloudTableClient();

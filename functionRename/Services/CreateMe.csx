@@ -27,11 +27,12 @@ public class CreateMe
             Username = "dimon",
             Password = "password",
             Provider = "password",
-            ClientId = "Angular"
+            ClientId = "Angular",
+            RememberMe = true
         };
 
         var registeredUser = new Authorisation().GetUser(generedUser, userId, Actions.Me);
-        var result = userQuery.Add(registeredUser);
+        userQuery.Add(registeredUser);
 
         return registeredUser;
     }

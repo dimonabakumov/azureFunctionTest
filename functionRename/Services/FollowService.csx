@@ -11,10 +11,10 @@ public class FollowService
 	{
         var me = new UserModelQuery().Get(sessionId, Actions.Me);
         var newFollower = new Authorisation().GetUser(new Registration().Generate(), sessionId, Actions.FollowYou);
-        var follow = new Following().Follow(me.Id, newFollower);
+        var follow = new Following().Follow(Guid.Parse(me.RowKey), newFollower);
         if (follow == 204)
         {
-            var result = new UserModelQuery().Add(newFollower);
+            new UserModelQuery().Add(newFollower);
             return "Followed";
         }
         else
@@ -25,7 +25,7 @@ public class FollowService
     {
         var me = new UserModelQuery().Get(sessionId, Actions.Me);
         var myFans = new UserModelQuery().GetList(sessionId, Actions.FollowYou);
-        var unfollow = new Following().Unfollow(me.Id, myFans);
+        var unfollow = new Following().Unfollow(Guid.Parse(me.RowKey), myFans);
         if (unfollow == 204)
         {
             new UserModelQuery().Delete(myFans);
