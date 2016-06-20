@@ -87,7 +87,7 @@ public class InviteService
                 Guid songId;
                 if (me.SongId.HasValue)
                 {
-                    inviteId = invites.PostInvite((Guid)me.SongId, me.AccessToken, owner.RowKey);
+                    inviteId = invites.PostInvite((Guid)me.SongId, me.AccessToken, owner.RowKey, false);
                     invites.AcceptAnInvite(inviteId, owner.AccessToken);
                 }
                 else
