@@ -57,6 +57,7 @@ public class Authorisation
             Login = username,
             Password = password,
             Provider = "password",
+            ClientId = "Angular",
             Register = false
         };
 
