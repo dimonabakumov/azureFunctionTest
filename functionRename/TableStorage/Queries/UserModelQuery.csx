@@ -2,6 +2,7 @@
 #load "..\..\Configuration\Actions.csx"
 #load "..\..\Configuration\TablesNames.csx"
 #load "..\Models\UserStorageModel.csx"
+#load "..\..\Requests\Authorisation.csx"
 
 using System;
 using Microsoft.WindowsAzure.Storage;
@@ -23,12 +24,25 @@ public class UserModelQuery : BaseModelQuery
         return table.ExecuteQuery(exQuery).ToList();
     }
 
-    public void TryGet(string sessionId, Actions action)
+    public bool TryGet(string sessionId, Actions action, string username, string password)
     {
-        var results = Get(sessionId, action);
-
+        var exQuery = QueryByAllFields(sessionId, action, username, password);
+        var results = table.ExecuteQuery(exQuery).FirstOrDefault();
         if (results != null)
-            table.Delete();
+        {
+            var newToken = new Authorisation().RefreshToken(username, password);
+            if (newToken == null)
+                return false;
+
+            UpdateToken(results.PartitionKey, results.RowKey, newToken);
+            return true;
+        }
+        else
+        {
+            var usersOfSession = table.ExecuteQuery(UserQuery(sessionId)).ToList();
+            Delete(usersOfSession);
+            return false;
+        }
     }
 
     public void Add(UserStorageModel createdUser)
@@ -74,6 +88,21 @@ public class UserModelQuery : BaseModelQuery
         }
     }
 
+    public void UpdateToken(string partitionKey, string rowKey, string AccessToken)
+    {
+        var retrieveOperation = TableOperation.Retrieve<UserStorageModel>(partitionKey, rowKey);
+        var retrievedResult = table.Execute(retrieveOperation);
+        var updateEntity = (UserStorageModel)retrievedResult.Result;
+
+        if (updateEntity != null)
+        {
+            updateEntity.AccessToken = AccessToken;
+
+            var insertOrReplaceOperation = TableOperation.InsertOrReplace(updateEntity);
+            table.Execute(insertOrReplaceOperation);
+        }
+    }
+
     protected TableQuery<UserStorageModel> UserQuery(string sessionId, Actions action)
     {
         return new TableQuery<UserStorageModel>().Where(
@@ -81,5 +110,26 @@ public class UserModelQuery : BaseModelQuery
                 TableQuery.GenerateFilterCondition("PartitionKey", QueryComparisons.Equal, sessionId),
                 TableOperators.And,
                 TableQuery.GenerateFilterCondition("Actions", QueryComparisons.Equal, action.ToString())));
+    }
+
+    protected TableQuery<UserStorageModel> UserQuery(string sessionId)
+    {
+        return new TableQuery<UserStorageModel>().Where(
+                TableQuery.GenerateFilterCondition("PartitionKey", QueryComparisons.Equal, sessionId));
+    }
+
+    protected TableQuery<UserStorageModel> QueryByAllFields(string sessionId, Actions action, string username, string password)
+    {
+        var firstFilter = TableQuery.CombineFilters(TableQuery.GenerateFilterCondition("PartitionKey", QueryComparisons.Equal, sessionId),
+                TableOperators.And,TableQuery.GenerateFilterCondition("Actions", QueryComparisons.Equal, action.ToString()));
+
+        var secondFilter = TableQuery.CombineFilters(TableQuery.GenerateFilterCondition("UserName", QueryComparisons.Equal, username),
+                TableOperators.And, TableQuery.GenerateFilterCondition("Password", QueryComparisons.Equal, password));
+
+        return new TableQuery<UserStorageModel>().Where(
+            TableQuery.CombineFilters(
+                firstFilter,
+                TableOperators.And,
+                secondFilter));
     }
 }

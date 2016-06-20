@@ -13,27 +13,30 @@ using Newtonsoft.Json;
 using Microsoft.WindowsAzure.Storage;
 using Microsoft.WindowsAzure.Storage.Table;
 
-
-
 public class CreateMe
 {
-	public UserStorageModel Auth(string userId)
+	public bool Auth(string sessionId, string username, string password)
 	{
         var userQuery = new UserModelQuery();
-        userQuery.TryGet(userId, Actions.Me);
+        var userExist = userQuery.TryGet(sessionId, Actions.Me, username, password);
+	    if (userExist) return true;
+	    else
+	    {
+	        var generedUser = new AuthorizationModel
+	        {
+	            Username = username,
+	            Password = password,
+	            Provider = "password",
+	            ClientId = "Angular",
+	            RememberMe = true
+	        };
 
-        var generedUser = new AuthorizationModel
-        {
-            Username = "dimon",
-            Password = "password",
-            Provider = "password",
-            ClientId = "Angular",
-            RememberMe = true
-        };
+	        var registeredUser = new Authorisation().GetUser(generedUser, sessionId, Actions.Me);
+	        if (registeredUser == null)
+	            return false;
 
-        var registeredUser = new Authorisation().GetUser(generedUser, userId, Actions.Me);
-        userQuery.Add(registeredUser);
-
-        return registeredUser;
+            userQuery.Add(registeredUser);
+	        return true;
+	    }
     }
 }

@@ -12,6 +12,10 @@ using System.Web;
 
 public class SlackInterpreter
 {
+    protected string Username { get; set; }
+
+    protected string Password { get; set; }
+
     public object ExtractCommand(string request)
     {
         var coll = System.Web.HttpUtility.ParseQueryString(request);
@@ -21,11 +25,17 @@ public class SlackInterpreter
         {
             var text = coll.Get("text").Trim('\'').Split(' ');
             var sessionId = coll.Get("user_id").Trim('\'');
+            if (int.Parse(text[1]) == 1)
+            {
+                Username = text[2].Split('/')[0];
+                Password = text[2].Split('/')[1];
+            }
             return ExecCommand(int.Parse(text[1]), sessionId);
         }
         catch (Exception ex)
         {
-            return new {exeprion = ex};
+            return new { text = "Can't parse your command" };
+            //return new {exeprion = ex};
         }
     }
 
@@ -36,15 +46,40 @@ public class SlackInterpreter
             // Help
 
             case 0:
-                //return new { text = new ShoutService().Create(sessionId) };
-                return new { text = "Help is here...\r\n" + "Second line \r\n " };
+                return new
+                {
+                    text = "Existing commands(triggered word is *go*) : \r\n"
+                    + "0 - Help \r\n "
+                    + "1 - Authorise a user(go 1 username/password) \r\n "
+                    + "2 - Follow me \r\n "
+                    + "3 - Unfollow me \r\n "
+                    + "4 - Like my revision \r\n "
+                    + "5 - Dislike my revision \r\n "
+                    + "6 - Comment my revision \r\n "
+                    + "7 - Comment my revision with mintion me \r\n "
+                    + "8 - Delete all comments from revision \r\n "
+                    + "9 - New song in my band \r\n "
+                    + "10 - New revision in any song \r\n "
+                    + "11 - New revision based on my revision \r\n "
+                    + "12 - Like my shout \r\n "
+                    + "13 - Dislike my shout \r\n "
+                    + "14 - Comment my shout \r\n "
+                    + "15 - Comment my shout with mintion me \r\n "
+                    + "16 - Delete all comments from shout \r\n "
+                    + "17 - User sends request to join my band \r\n "
+                    + "18 - User invites me in their band \r\n "
+                    + "19 - User invites me to collaborate \r\n "
+                    + "20 - User joined my band \r\n "
+                    + "21 - User joined my song \r\n "
+                    + "22 - User fork my song, create new revision and publish it \r\n "
+                };
                 break;
 
-            // Reg/Auth user
+            // Authorise a user
 
             case 1:
-                var reg = new CreateMe().Auth(sessionId);
-                return new { text = "Registered! Username : " + reg.UserName + " Password : " + reg.Password };
+                var reg = new CreateMe().Auth(sessionId, Username, Password);
+                return reg ? new { text = "User " + Username + " with Password : " + Password + " authorised" } : new { text = "Unsuccessful authorisation" };
                 break;
 
             // Follow me
@@ -77,16 +112,16 @@ public class SlackInterpreter
                 return new { text = new LikeCommentService().LeftComment(sessionId) };
                 break;
 
-            // Delete comment from revision
-
-            case 7:
-                return new { text = new LikeCommentService().DeleteComment(sessionId) };
-                break;
-
             // Comment my revision with mintion me
 
-            case 8:
+            case 7:
                 return new { text = new LikeCommentService().LeftComment(sessionId, true) };
+                break;
+
+            // Delete all comments from revision
+
+            case 8:
+                return new { text = new LikeCommentService().DeleteComment(sessionId) };
                 break;
 
             // New song in my band
@@ -107,46 +142,46 @@ public class SlackInterpreter
                 return new { text = new RevisionService().NewRevisionBasedOnMy(sessionId) };
                 break;
 
-            // User sends request to join my band
-
-            case 12:
-                return new { text = new InviteService().RequestToJoinBand(sessionId, withAccept: true) };
-                break;
-
-           // User invites me in their band
-
-            case 13:
-                return new { text = new InviteService().InviteTo(sessionId) };
-                break;
-
             // Like my shout
 
-            case 14:
+            case 12:
                 return new { text = new ShoutService().Like(sessionId) };
                 break;
 
             // Dislike my shout
 
-            case 15:
+            case 13:
                 return new { text = new ShoutService().Dislike(sessionId) };
                 break;
 
             // Comment my shout
 
-            case 16:
+            case 14:
                 return new { text = new ShoutService().LeftComment(sessionId) };
-                break;
-
-            // Delete comment from shout
-
-            case 17:
-                return new { text = new ShoutService().DeleteComment(sessionId) };
                 break;
 
             // Comment my shout with mintion me
 
-            case 18:
+            case 15:
                 return new { text = new ShoutService().LeftComment(sessionId, true) };
+                break;
+
+            // Delete comment from shout
+
+            case 16:
+                return new { text = new ShoutService().DeleteComment(sessionId) };
+                break;
+
+            // User sends request to join my band
+
+            case 17:
+                return new { text = new InviteService().RequestToJoinBand(sessionId, withAccept: true) };
+                break;
+
+            // User invites me in their band
+
+            case 18:
+                return new { text = new InviteService().InviteTo(sessionId) };
                 break;
 
             // User invites me to collaborate

@@ -10,28 +10,38 @@ public class FollowService
 	public string Follow(string sessionId)
 	{
         var me = new UserModelQuery().Get(sessionId, Actions.Me);
-        var newFollower = new Authorisation().GetUser(new Registration().Generate(), sessionId, Actions.FollowYou);
-        var follow = new Following().Follow(Guid.Parse(me.RowKey), newFollower);
-        if (follow == 204)
-        {
-            new UserModelQuery().Add(newFollower);
-            return "Followed";
-        }
-        else
-            return "Something went wrong";
-    }
+	    if (me != null)
+	    {
+	        var newFollower = new Authorisation().GetUser(new Registration().Generate(), sessionId, Actions.FollowYou);
+	        var follow = new Following().Follow(Guid.Parse(me.RowKey), newFollower);
+	        if (follow == 204)
+	        {
+	            new UserModelQuery().Add(newFollower);
+	            return "Followed";
+	        }
+	        else
+	            return "Something went wrong";
+	    }
+	    else
+	        return "You need to authorise the user";
+	}
 
     public string Unfollow(string sessionId)
     {
         var me = new UserModelQuery().Get(sessionId, Actions.Me);
-        var myFans = new UserModelQuery().GetList(sessionId, Actions.FollowYou);
-        var unfollow = new Following().Unfollow(Guid.Parse(me.RowKey), myFans);
-        if (unfollow == 204)
+        if (me != null)
         {
-            new UserModelQuery().Delete(myFans);
-            return "Unfollowed";
+            var myFans = new UserModelQuery().GetList(sessionId, Actions.FollowYou);
+            var unfollow = new Following().Unfollow(Guid.Parse(me.RowKey), myFans);
+            if (unfollow == 204)
+            {
+                new UserModelQuery().Delete(myFans);
+                return "Unfollowed";
+            }
+            else
+                return "Something went wrong";
         }
         else
-            return "Something went wrong";
+            return "You need to authorise the user";
     }
 }

@@ -12,9 +12,10 @@ public class RevisionService
 	public Guid CreateIfDoesntExist(string sessionId, Guid? parentId = null, Guid? bandId = null)
 	{
         var me = new UserModelQuery().Get(sessionId, Actions.Me);
+	    if (me == null)
+	        return Guid.Empty;
         if (me.RevisionId != null)
             return (Guid)me.RevisionId;
-
         else
             return Create(me).Id;
     }
@@ -30,7 +31,9 @@ public class RevisionService
 
     public string NewSongInTheBand(string sessionId)
     {
-        new InviteService().RequestToJoinBand(sessionId, Actions.NewSongInBand, true);
+        var invitation = new InviteService().RequestToJoinBand(sessionId, Actions.NewSongInBand, true);
+        if (invitation.Equals("You need to authorise the user"))
+            return "You need to authorise the user";
         var NewSongAuthor = new UserModelQuery().Get(sessionId, Actions.NewSongInBand);
         var rootRevision = Create(NewSongAuthor);
         var moveSongToTheBand = new Bands().MoveSongtoTheBand(NewSongAuthor.AccessToken, (Guid)NewSongAuthor.BandId, rootRevision.Song.Id);
@@ -40,6 +43,13 @@ public class RevisionService
     public string NewRevisionInAnySong(string sessionId)
     {
         var NewSongAuthor = new UserModelQuery().Get(sessionId, Actions.NewSongInBand);
+        if (NewSongAuthor == null)
+        {
+            var newSong = NewSongInTheBand(sessionId);
+            if(newSong.Equals("You need to authorise the user"))
+                return "You need to authorise the user";
+        }
+
         var newRevision = Create(NewSongAuthor, NewSongAuthor.RevisionId);
         return "Created";
     }
@@ -47,6 +57,8 @@ public class RevisionService
     public string NewRevisionBasedOnMy(string sessionId)
     {
         var me = new UserModelQuery().Get(sessionId, Actions.Me);
+        if(me == null)
+            return "You need to authorise the user";
         var existingSongAuthor = new UserModelQuery().Get(sessionId, Actions.NewSongInBand);
         if (existingSongAuthor != null)
         {
@@ -67,11 +79,13 @@ public class RevisionService
     public string PublishForkedRevision(string sessionId)
     {
         var myRevisionId = CreateIfDoesntExist(sessionId);
-        UserStorageModel forker = new UserModelQuery().Get(sessionId, Actions.PublishForkedRevision);
+        if (myRevisionId == Guid.Empty)
+            return "You need to authorise the user";
+
+        var forker = new UserModelQuery().Get(sessionId, Actions.PublishForkedRevision);
         if(forker == null)
             forker = new Authorisation().GetUser(new Registration().Generate(), sessionId, Actions.PublishForkedRevision);
-        var revisionsRequest = new Revisions();
-        var forkedRevisionId = revisionsRequest.ForkSong(myRevisionId, forker.AccessToken);
+        var forkedRevisionId = new Revisions().ForkSong(myRevisionId, forker.AccessToken);
         var publicForkedRevision = Create(forker, forkedRevisionId);
 
         if (publicForkedRevision != null)

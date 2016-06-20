@@ -39,7 +39,7 @@ public class Following
 
         Task.WaitAll(tasks.ToArray());
 
-        if (tasks.FirstOrDefault(x => x.Result.StatusCode != HttpStatusCode.NoContent) != null)
+        if (tasks.FirstOrDefault(x => x.Result.StatusCode != System.Net.HttpStatusCode.NoContent) != null)
             return 400;
 
         return 204;

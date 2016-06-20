@@ -61,7 +61,7 @@ public class Revisions
 
         Task.WaitAll(tasks.ToArray());
 
-        if (tasks.FirstOrDefault(x => x.Result.StatusCode != HttpStatusCode.Accepted) != null)
+        if (tasks.FirstOrDefault(x => x.Result.StatusCode != System.Net.HttpStatusCode.Accepted) != null)
             return 400;
 
         return 202;
@@ -100,7 +100,7 @@ public class Revisions
 
         Task.WaitAll(tasks.ToArray());
 
-        if (tasks.FirstOrDefault(x => x.Result.StatusCode != HttpStatusCode.Accepted) != null)
+        if (tasks.FirstOrDefault(x => x.Result.StatusCode != System.Net.HttpStatusCode.Accepted) != null)
             return 400;
 
         return 202;

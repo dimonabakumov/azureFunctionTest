@@ -12,9 +12,10 @@ public class ShoutService
     public Guid CreateIfDoesntExist(string sessionId)
     {
         var me = new UserModelQuery().Get(sessionId, Actions.Me);
+        if (me == null)
+            return Guid.Empty;
         if (me.PostId != null)
             return (Guid)me.PostId;
-
         else
             return Create(me);
     }
@@ -29,6 +30,9 @@ public class ShoutService
     public string Like(string sessionId)
     {
         var postId = CreateIfDoesntExist(sessionId);
+        if (postId == Guid.Empty)
+            return "You need to authorise the user";
+
         var newLiker = new Authorisation().GetUser(new Registration().Generate(), sessionId, Actions.LikeYourShout);
         var userQuery = new UserModelQuery();
         userQuery.Add(newLiker);
@@ -45,6 +49,9 @@ public class ShoutService
     public string Dislike(string sessionId)
     {
         var myLikers = new UserModelQuery().GetList(sessionId, Actions.LikeYourShout);
+        if(myLikers.Count == 0)
+            return "You have no likers";
+
         var dislike = new Shouts().Dislike(myLikers);
         new UserModelQuery().Delete(myLikers);
         return "Disliked";
@@ -53,6 +60,9 @@ public class ShoutService
     public string LeftComment(string sessionId, bool withMentionMe = false)
     {
         var me = new UserModelQuery().Get(sessionId, Actions.Me);
+        if (me == null)
+            return "You need to authorise the user";
+
         var shoutId = CreateIfDoesntExist(sessionId);
         var newCommenter = new Authorisation().GetUser(new Registration().Generate(), sessionId, Actions.CommentYourShout);
         var userQuery = new UserModelQuery();
@@ -70,6 +80,9 @@ public class ShoutService
     public string DeleteComment(string sessionId)
     {
         var myCommenters = new UserModelQuery().GetList(sessionId, Actions.CommentYourShout);
+        if(myCommenters.Count == 0)
+            return "Nobody comments your shout";
+
         var deleteComment = new Shouts().DeleteComment(myCommenters);
         new UserModelQuery().Delete(myCommenters);
         return "Comment deleted";

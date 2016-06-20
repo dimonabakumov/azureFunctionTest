@@ -22,7 +22,8 @@ public class Authorisation
         var postContent = new StringContent(JsonConvert.SerializeObject(authUser));
         postContent.Headers.ContentType = new MediaTypeHeaderValue("Application/Json");
         var post = toApi.PostAsync(ApiUrls.Identity + "authorizations", postContent).Result;
-
+        if (post.StatusCode != System.Net.HttpStatusCode.Created)
+            return null;
 
         //Extract auth token
 
@@ -47,5 +48,29 @@ public class Authorisation
             ExpiryDate = wasRegister.ExpiryDate,
             RefreshToken = wasRegister.RefreshToken,
         };
+    }
+
+    public string RefreshToken(string username, string password)
+    {
+        var authUser = new AuthorizationModel
+        {
+            Login = username,
+            Password = password,
+            Provider = "password",
+            Register = false
+        };
+
+        var toApi = new HttpClient();
+        var postContent = new StringContent(JsonConvert.SerializeObject(authUser));
+        postContent.Headers.ContentType = new MediaTypeHeaderValue("Application/Json");
+        var post = toApi.PostAsync(ApiUrls.Identity + "authorizations", postContent).Result;
+        if (post.StatusCode != System.Net.HttpStatusCode.Created)
+            return null;
+
+        //Extract auth token
+
+        var wasRegister = JsonConvert.DeserializeObject<WasRegisteredModel>(post.Content.ReadAsStringAsync().Result);
+
+        return wasRegister.SessionKey;
     }
 }
